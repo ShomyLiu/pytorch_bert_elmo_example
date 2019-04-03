@@ -13,6 +13,7 @@ class TextCNN(nn.Module):
 
         super(TextCNN, self).__init__()
         self.opt = opt
+        self.use_gpu = self.opt.use_gpu
 
         if self.opt.emb_method == 'elmo':
             self.init_elmo()
@@ -26,21 +27,30 @@ class TextCNN(nn.Module):
         self.cnns = nn.ModuleList([nn.Conv2d(1, self.opt.num_filters, (i, self.word_dim)) for i in self.opt.k])
         self.linear = nn.Linear(self.opt.num_filters * len(self.opt.k), self.opt.num_labels)
         self.dropout = nn.Dropout(self.opt.dropout)
-        self.use_gpu = self.opt.use_gpu
 
     def init_elmo(self):
+        '''
+        initilize the ELMo model
+        '''
         self.elmo = Elmo(self.opt.elmo_options_file, self.opt.elmo_weight_file, 1)
         self.word_dim = self.opt.elmo_dim
 
     def init_glove(self):
+        '''
+        load the GloVe model
+        '''
         self.word2id = np.load(self.opt.word2id_file).tolist()
         self.glove = nn.Embedding(self.opt.vocab_size, self.opt.glove_dim)
         emb = torch.from_numpy(np.load(self.opt.glove_file))
-        emb = emb.to(self.opt.device)
+        if self.use_gpu:
+            emb = emb.to(self.opt.device)
         self.glove.weight.data.copy_(emb)
         self.word_dim = self.opt.glove_dim
 
     def get_elmo(self, sentence_lists):
+        '''
+        get the ELMo word embedding vectors for a sentences
+        '''
         character_ids = batch_to_ids(sentence_lists)
         if self.opt.use_gpu:
             character_ids = character_ids.to(self.opt.device)
@@ -48,9 +58,10 @@ class TextCNN(nn.Module):
         return embeddings['elmo_representations'][0]
 
     def get_glove(self, sentence_lists):
-        # __import__('ipdb').set_trace()
+        '''
+        get the glove word embedding vectors for a sentences
+        '''
         max_len = max(map(lambda x: len(x), sentence_lists))
-        # max_len = 120
         sentence_lists = list(map(lambda x: list(map(lambda w: self.word2id.get(w, 0), x)), sentence_lists))
         sentence_lists = list(map(lambda x: x + [self.opt.vocab_size-1] * (max_len - len(x)), sentence_lists))
         sentence_lists = torch.LongTensor(sentence_lists)
@@ -67,7 +78,7 @@ class TextCNN(nn.Module):
             word_embs = self.get_glove(x)
         elif self.opt.emb_method == 'elmo_glove':
             glove = self.get_glove(x)
-            elmo = self.get_elmo()
+            elmo = self.get_elmo(x)
             word_embs = torch.cat([elmo, glove], -1)
 
         x = word_embs.unsqueeze(1)
