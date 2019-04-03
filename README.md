@@ -14,6 +14,7 @@
     - sklearn
     - fire
 - 克隆代码到本地 (包含ELMo 512维的参数文件, 以及GloVe向量文件, 总大小共100M左右)
+- 解压data/elmo.7z 
 - 运行代码：
     ```
     python main.py train --emb_method='elmo'
