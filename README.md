@@ -19,7 +19,7 @@
     ```
     python main.py train --emb_method='elmo'
     ```
-- 可配置项: 参看`config.py`, 如使用`--batch_size=128`指定batch
+- 可配置项: 参看`config.py`, 比如使用`--gpu_id=1`来指定使用的GPU
 
 ## 结果
 ELMo速度要慢，效果提升不太明显
