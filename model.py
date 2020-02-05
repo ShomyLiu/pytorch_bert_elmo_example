@@ -25,7 +25,12 @@ class TextCNN(nn.Module):
             self.word_dim = self.opt.elmo_dim + self.opt.glove_dim
 
         self.cnns = nn.ModuleList([nn.Conv2d(1, self.opt.num_filters, (i, self.word_dim)) for i in self.opt.k])
+        for cnn in self.cnns:
+            nn.init.xavier_normal_(cnn.weight)
+            nn.init.constant_(cnn.bias, 0.)
         self.linear = nn.Linear(self.opt.num_filters * len(self.opt.k), self.opt.num_labels)
+        nn.init.xavier_uniform_(self.linear.weight)
+        nn.init.constant_(self.linear.bias, 0)
         self.dropout = nn.Dropout(self.opt.dropout)
 
     def init_elmo(self):
