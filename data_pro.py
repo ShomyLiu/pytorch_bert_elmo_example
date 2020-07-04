@@ -8,6 +8,7 @@ import pickle
 
 from torch.utils.data import Dataset
 
+
 class Data(Dataset):
     def __init__(self, x, y):
         self.data = list(zip(x, y))
@@ -59,7 +60,7 @@ def extract_vocab(positive_data_file, negative_data_file):
 
     vocab = list(set(vocab))
     print("vocab size: {}.".format(len(vocab)))
-    open("./data/vocab.txt", "w").write("\n".join(vocab))
+    open("./data/glove/vocab.txt", "w").write("\n".join(vocab))
 
 
 def get_glove(w2v_path, vocab_path):
