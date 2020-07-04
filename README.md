@@ -1,4 +1,4 @@
-## 测试ELMo词向量
+## 测试Bert/ELMo词向量
 - 任务: 文本分类 (text classification)
 - 数据集： 电影评论情感分类
 - 模型 word embeddings + encoder:
