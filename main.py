@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import time
+import random
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -27,6 +29,12 @@ def train(**kwargs):
     device = torch.device("cuda:{}".format(opt.gpu_id) if torch.cuda.is_available() else "cpu")
     opt.device = device
 
+    random.seed(opt.seed)
+    np.random.seed(opt.seed)
+    torch.manual_seed(opt.seed)
+    if opt.use_gpu:
+        torch.cuda.manual_seed_all(opt.seed)
+
     x_text, y = load_data_and_labels("./data/rt-polarity.pos", "./data/rt-polarity.neg")
     x_train, x_test, y_train, y_test = train_test_split(x_text, y, test_size=opt.test_size)
 
@@ -48,7 +56,8 @@ def train(**kwargs):
     lr_sheduler = optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.7)
     best_acc = -0.1
     best_epoch = -1
-    for epoch in range(opt.epochs):
+    start_time = time.time()
+    for epoch in range(1, opt.epochs):
         total_loss = 0.0
         model.train()
         for step, batch_data in enumerate(train_loader):
@@ -70,8 +79,9 @@ def train(**kwargs):
         print(f"{now()} Epoch{epoch}: loss: {total_loss}, test_acc: {acc}")
         lr_sheduler.step()
 
+    end_time = time.time()
     print("*"*20)
-    print(f"{now()} finished; epoch {best_epoch} best_acc: {best_acc}")
+    print(f"{now()} finished; epoch {best_epoch} best_acc: {best_acc}, time/epoch: {(end_time-start_time)/opt.epochs}")
 
 
 def test(model, test_loader):
@@ -88,7 +98,8 @@ def test(model, test_loader):
                 output = output.cpu()
             predict = torch.max(output.data, 1)[1]
             correct += (predict == labels).sum().item()
-        return correct * 1.0 / num
+    model.train()
+    return correct * 1.0 / num
 
 
 if __name__ == "__main__":
