@@ -38,9 +38,9 @@ class Encoder(nn.Module):
             self.rnn = nn.GRU(input_size, hidden_size//2, batch_first=True, bidirectional=True)
             f_dim = hidden_size
         elif enc_method == 'transformer':
-            self.pe = PositionalEncoding(input_size, 512)
-            self.layer = nn.TransformerEncoderLayer(d_model=input_size, nhead=2)
-            self.tr = nn.TransformerEncoder(self.layer, num_layers=2)
+            self.pe = PositionEmbedding(input_size, 512)
+            self.layer = nn.TransformerEncoderLayer(d_model=input_size, nhead=1)
+            self.tr = nn.TransformerEncoder(self.layer, num_layers=1)
             f_dim = input_size
         else:
             f_dim = input_size
@@ -53,20 +53,30 @@ class Encoder(nn.Module):
         if self.enc_method == 'cnn':
             x = inputs.unsqueeze(1)
             x = F.relu(self.conv(x).squeeze(3))
-            out = F.max_pool1d(x, x.size(2)).squeeze(2)
+            out = x.permute(0, 2, 1)
         elif self.enc_method == 'rnn':
-            rnn_output, tmp = self.rnn(inputs)
-            out = rnn_output[:, -1, :]                              # (B, L, hidden_size)
+            out, _ = self.rnn(inputs)
         elif self.enc_method == 'transformer':
             inputs = self.pe(inputs)
             out = self.tr(inputs)
-            out = out.mean(1)
         else:
-            out = inputs.mean(1)
+            out = inputs
+        return self.fc(out.mean(1))
 
-        return self.fc(out)
+
+class PositionEmbedding(nn.Module):
+    def __init__(self, d_model, max_len):
+        super(PositionEmbedding, self).__init__()
+        self.pe = nn.Embedding(max_len, d_model)
+        nn.init.uniform_(self.pe.weight, -0.1, 0.1)
+
+    def forward(self, x):
+        b, l, d = x.size()
+        seq_len = torch.arange(l).to(x.device)
+        return x + self.pe(seq_len).unsqueeze(0)
 
 
+# performance poor
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, max_len):
         super(PositionalEncoding, self).__init__()
