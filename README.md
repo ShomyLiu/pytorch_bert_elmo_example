@@ -12,10 +12,14 @@
         - PositionEncoding+Transformer+Average Pooling
         - Average all words
 
+博客总结：[Bert/ELMo文本分类](http://shomy.top/2020/07/06/bert-elmo-cls/)
+
+
 ## 使用方法 Usage
 - 环境:
     - python3.6+
     - pytorch 1.4+
+    - transformers
     - AllenNLP
     - sklearn
     - fire
@@ -38,20 +42,17 @@
 
 此外，实验中我们将Bert与ELMo的参数固定住. 
 
-
-| Embedding | Encoder |  Acc| Second|
-| ---- | ---- | ----| ---- |
-| Bert  | Mean        |     |     |
-| Bert  | CNN         |     |     |
-| Bert  | RNN         |     |     |
-| Bert  | Transformer |     |     |
-| ELMo  | Mean        |     |     |
-| ELMo  | CNN         |     |     |
-| ELMo  | RNN         |     |     |
-| ELMo  | Transformer |     |     |
-| GloVe | Mean        |     |     |
-| GloVe | CNN         |     |     |
-| GloVe | RNN         |     |     |
-| GloVe | Transformer |     |     |
-
-
+| Embedding | Encoder | Acc | Second |
+| - | - | - | - |
+| **Bert** | MEAN | 0.8031 | 17.98s |
+| **Bert** | CNN | 0.8397 | 18.35s |
+| **Bert** | RNN | 0.8444 | 18.93s |
+| **Bert** | Transformer | **0.8472** | 20.95s |
+| *ELMo* | Mean | 0.7572 | 25.05s |
+| *ELMo* | CNN | 0.8172 | 25.53s |
+| *ELMo* | RNN | **0.8219** | 27.18s |
+| *ELMo* | Transformer | 0.8051 | 26.209 |
+| GloVe | Mean | 0.8003 | 0.60s |
+| GloVe | CNN | 0.8031 | 0.76s |
+| GloVe | RNN | **0.8219** | 1.45s |
+| GloVe | Transformer | 0.8153 | 1.71s |
