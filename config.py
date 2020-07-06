@@ -18,13 +18,14 @@ class Config():
     glove_file = "./data/glove/glove_300d.npy"
     word2id_file = "./data/glove/word2id.npy"
 
-    emb_method = 'elmo'  # elmo/glove/elmo_glove
+    emb_method = 'glove'  # bert/elmo/glove/
     enc_method = 'CNN'  # CNN/RNN/Transformer/mean
     hidden_size = 200
     out_size = 64
     num_labels = 2
 
     use_gpu = True
+    seed = 2020
     gpu_id = 0
 
     dropout = 0.5
