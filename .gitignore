@@ -1,2 +1,6 @@
 *pyc
 __pycache__/
+data/bert
+data/elmo
+data/glove
+*sh
