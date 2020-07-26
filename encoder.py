@@ -58,7 +58,7 @@ class Encoder(nn.Module):
             out, _ = self.rnn(inputs)
         elif self.enc_method == 'transformer':
             inputs = self.pe(inputs)
-            out = self.tr(inputs)
+            out = self.tr(inputs.permute(1, 0, 2)).permute(1, 0, 2)
         else:
             out = inputs
         return self.fc(out.mean(1))
