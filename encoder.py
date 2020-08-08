@@ -28,16 +28,16 @@ class Encoder(nn.Module):
         -------
         '''
         super(Encoder, self).__init__()
-        self.enc_method = enc_method
-        if enc_method == 'cnn':
+        self.enc_method = enc_method.lower()
+        if self.enc_method == 'cnn':
             self.conv = nn.Conv2d(1, hidden_size, (3, input_size))
             nn.init.xavier_uniform_(self.conv.weight)
             nn.init.constant_(self.conv.bias, 0.0)
             f_dim = hidden_size
-        elif enc_method == 'rnn':
+        elif self.enc_method == 'rnn':
             self.rnn = nn.GRU(input_size, hidden_size//2, batch_first=True, bidirectional=True)
             f_dim = hidden_size
-        elif enc_method == 'transformer':
+        elif self.enc_method == 'transformer':
             self.pe = PositionEmbedding(input_size, 512)
             self.layer = nn.TransformerEncoderLayer(d_model=input_size, nhead=1)
             self.tr = nn.TransformerEncoder(self.layer, num_layers=1)
